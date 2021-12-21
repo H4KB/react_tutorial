@@ -52,3 +52,7 @@ body {
   .current {
     font-weight: bold;
   }
+
+  .highlight {
+    color: red;
+  }

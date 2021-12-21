@@ -5,7 +5,10 @@ import './index.css';
 function Square(props) {
     return (
       <button className="square" onClick={props.onClick}>
-        {props.value}
+        {props.highlight
+          ? <div className="highlight">{props.value}</div>
+          : <div>{props.value}</div>
+        }
       </button>
     )
 }
@@ -16,6 +19,7 @@ class Board extends React.Component {
       <Square
         value={this.props.squares[i]}
         onClick={() => this.props.onClick(i)}
+        highlight={this.props.highlight[i]}
         key={i}
       />
     );
@@ -53,6 +57,7 @@ class Game extends React.Component {
           squares: Array(9).fill(null),
         },
       ],
+      highlight: Array(9).fill(false),
       positionHistory: [null],
       stepNumber: 0,
       xIsNext: true,
@@ -66,7 +71,14 @@ class Game extends React.Component {
     const squares = current.squares.slice();
     const positionHistory = this.state.positionHistory.slice(0, this.state.stepNumber + 1);
     
-    if (squares[i] || calculateWinner(squares)) {
+    if (squares[i]) {
+      return;
+    }
+
+    const result = calculateWinner(squares)
+    const winner = result[0]
+
+    if (winner) {
       return;
     }
     
@@ -96,7 +108,10 @@ class Game extends React.Component {
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
-    const winner = calculateWinner(current.squares);
+    const result = calculateWinner(current.squares)
+    const winner = result[0];
+    const highlight = result[1];
+    
     const player = this.state.xIsNext ? "X" : "O"
 
     const moves = history.map((step, move) => {
@@ -135,6 +150,7 @@ class Game extends React.Component {
         <div className="game-board">
           <Board
             squares={current.squares}
+            highlight={highlight}
             onClick={(i) => this.handleClick(i)}
           />
         </div>
@@ -165,6 +181,8 @@ function calculateWinner(squares) {
     [0, 4, 8],
     [2, 4, 6],
   ];
+  var highlight = Array(9).fill(false)
+  var winner = null;
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (
@@ -172,8 +190,11 @@ function calculateWinner(squares) {
       squares[a] === squares[b] &&
       squares[a] === squares[c]
     ) {
-      return squares[a];
+      highlight[a] = true;
+      highlight[b] = true;
+      highlight[c] = true;
+      winner = squares[a];
     }
   }
-  return null;
+  return [winner, highlight];
 }
