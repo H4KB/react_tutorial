@@ -78,7 +78,7 @@ class Game extends React.Component {
     const result = calculateWinner(squares)
     const winner = result[0]
 
-    if (winner) {
+    if (winner || fillSquares(squares)) {
       return;
     }
     
@@ -137,6 +137,8 @@ class Game extends React.Component {
     let status;
     if (winner) {
       status = "Winner: " + winner;
+    } else if (fillSquares(current.squares)) {
+      status = "Drow";
     } else {
       status = `Next player: ${player}`;
     }
@@ -197,4 +199,12 @@ function calculateWinner(squares) {
     }
   }
   return [winner, highlight];
+}
+
+function fillSquares(squares) {
+  return (
+    squares
+      .map((item) => item!==null)
+      .every((item) => item === true)
+  )
 }
