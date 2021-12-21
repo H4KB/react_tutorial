@@ -56,6 +56,7 @@ class Game extends React.Component {
       positionHistory: [null],
       stepNumber: 0,
       xIsNext: true,
+      ascending: true,
     };
   }
 
@@ -125,6 +126,10 @@ class Game extends React.Component {
       status = `Next player: ${player}`;
     }
 
+    if (!this.state.ascending) {
+      moves.reverse();
+    }
+
     return (
       <div className="game">
         <div className="game-board">
@@ -135,6 +140,9 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
+          <button onClick={() => this.setState({ascending: !this.state.ascending})}>
+            {this.state.ascending ? "降順" : "昇順"}
+          </button>
           <ol>{moves}</ol>
         </div>
       </div>
