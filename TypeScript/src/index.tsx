@@ -2,7 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-type SquareState = 'O' | 'X' | null;
+type Player = 'O' | 'X';
+type SquareState = Player | null;
+type Position = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
 type SquareProps = {
   value: SquareState;
@@ -19,11 +21,11 @@ function Square(props: SquareProps) {
 
 type BoardProps = {
   squares: SquareState[];
-  onClick: (i: number) => void;
+  onClick: (i: Position) => void;
 };
 
 class Board extends React.Component<BoardProps> {
-  renderSquare(i: number) {
+  renderSquare(i: Position) {
     return <Square value={this.props.squares[i]} onClick={() => this.props.onClick(i)} />;
   }
 
@@ -53,6 +55,7 @@ class Board extends React.Component<BoardProps> {
 type HistoryData = {
   squares: SquareState[];
   xIsNext: boolean;
+  clickPosition: Position | null;
 };
 
 type GameState = {
@@ -68,13 +71,14 @@ class Game extends React.Component<any, GameState> {
         {
           squares: [null, null, null, null, null, null, null, null, null],
           xIsNext: true,
+          clickPosition: null,
         },
       ],
       stepNumber: 0,
     };
   }
 
-  handleClick(i: number) {
+  handleClick(i: Position) {
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
@@ -91,6 +95,7 @@ class Game extends React.Component<any, GameState> {
         {
           squares: squares,
           xIsNext: !xIsNext,
+          clickPosition: i,
         },
       ]),
       stepNumber: history.length,
@@ -110,7 +115,12 @@ class Game extends React.Component<any, GameState> {
     const xIsNext = current.xIsNext;
 
     const moves = history.map((step, move) => {
-      const desc = move ? `Go to move #${move}` : 'Go to game start';
+      const clickPosition = step.clickPosition;
+
+      const player = step.xIsNext ? 'O' : 'X';
+      const x = clickPosition !== null ? clickPosition % 3 : '';
+      const y = clickPosition !== null ? parseInt((clickPosition / 3).toString()) : '';
+      const desc = move ? `Go to move #${move} (${player}: ${x}, ${y})` : 'Go to game start';
       return (
         <li key={move}>
           <button onClick={() => this.jumpTo(move)}>{desc}</button>
