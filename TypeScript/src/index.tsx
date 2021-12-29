@@ -100,6 +100,15 @@ class Game extends React.Component<any, GameState> {
     const squares = current.squares.slice();
     const xIsNext = current.xIsNext;
 
+    const moves = history.map((step, move) => {
+      const desc = move ? `Go to move #${move}` : 'Go to game start';
+      return (
+        <li key={move}>
+          <button>{desc}</button>
+        </li>
+      );
+    });
+
     const winner = calculateWinner(squares);
     let status: string;
 
@@ -115,7 +124,7 @@ class Game extends React.Component<any, GameState> {
         </div>
         <div className="game-info">
           <div>{status}</div>
-          <ol>{/* TODO */}</ol>
+          <ol>{moves}</ol>
         </div>
       </div>
     );
