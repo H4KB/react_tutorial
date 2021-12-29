@@ -63,6 +63,29 @@ type GameState = {
   stepNumber: number;
 };
 
+type HistoryButtonProps = {
+  onClick: () => void;
+  desc: string;
+};
+
+function HistoryButton(props: HistoryButtonProps) {
+  return (
+    <li>
+      <button onClick={props.onClick}>{props.desc}</button>
+    </li>
+  );
+}
+
+function HighlightHistoryButton(props: HistoryButtonProps) {
+  return (
+    <li>
+      <button onClick={props.onClick}>
+        <div className="current">{props.desc}</div>
+      </button>
+    </li>
+  );
+}
+
 class Game extends React.Component<any, GameState> {
   constructor(props: any) {
     super(props);
@@ -121,11 +144,12 @@ class Game extends React.Component<any, GameState> {
       const x = clickPosition !== null ? clickPosition % 3 : '';
       const y = clickPosition !== null ? parseInt((clickPosition / 3).toString()) : '';
       const desc = move ? `Go to move #${move} (${player}: ${x}, ${y})` : 'Go to game start';
-      return (
-        <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
-        </li>
-      );
+
+      if (move === this.state.stepNumber) {
+        return <HighlightHistoryButton key={move} desc={desc} onClick={() => this.jumpTo(move)} />;
+      } else {
+        return <HistoryButton key={move} desc={desc} onClick={() => this.jumpTo(move)} />;
+      }
     });
 
     const winner = calculateWinner(squares);
